@@ -1,0 +1,243 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useAnimationControls } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Sparkles, Zap, Flame, Loader2, BrainCircuit, ChevronRight, Hexagon, Code2, Atom, Dna } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const ZabalaIncLogo = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const controls = useAnimationControls();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFullText, setShowFullText] = useState(false);
+  const textRef = useRef(null);
+  const logoRef = useRef(null);
+  const [logoColor, setLogoColor] = useState('from-purple-500 to-blue-500');
+  const [fontFamily, setFontFamily] = useState('serif'); // Fuente por defecto
+
+  useEffect(() => {
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDark);
+  }, []);
+
+  useEffect(() => {
+    const colorInterval = setInterval(() => {
+      setLogoColor(prevColor => {
+        if (prevColor === 'from-purple-500 to-blue-500') {
+          return 'from-pink-500 to-yellow-500';
+        } else if (prevColor === 'from-pink-500 to-yellow-500') {
+          return 'from-green-500 to-teal-500';
+        } else {
+          return 'from-purple-500 to-blue-500';
+        }
+      });
+    }, 3000);
+
+    return () => clearInterval(colorInterval);
+  }, []);
+
+    // Cambiar la fuente de la Z cada 5 segundos
+    useEffect(() => {
+        const fontInterval = setInterval(() => {
+            setFontFamily(prevFont => {
+                if (prevFont === 'serif') {
+                    return "'Playfair Display', serif"; // Una fuente serif exótica
+                } else if (prevFont === "'Playfair Display', serif") {
+                    return "'Cinzel', serif";        // Otra fuente serif exótica
+                } else {
+                    return 'serif';                   // Volver a la fuente por defecto
+                }
+            });
+        }, 5000);
+
+        return () => clearInterval(fontInterval);
+    }, []);
+
+  const logoVariants = {
+    initial: { opacity: 0, scale: 0, rotate: 0 },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: {
+        duration: 2,
+        ease: 'easeInOut',
+        type: 'spring',
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+    hover: { scale: 1.1, rotate: 20, transition: { duration: 0.5, type: 'spring', stiffness: 80 } },
+    tap: { scale: 0.9 },
+  };
+
+  const textVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0, transition: { delay: 1.2, duration: 0.8, ease: 'easeInOut' } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.5 } },
+  };
+
+  const fullTextVariants = {
+    initial: { opacity: 0, y: 20, height: 0 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      height: 'auto',
+      transition: { duration: 0.8, delay: 1.5, ease: 'easeInOut' },
+    },
+    exit: { opacity: 0, y: -20, height: 0, transition: { duration: 0.3 } },
+  };
+
+  const iconVariants = {
+    initial: { opacity: 0, scale: 0.5 },
+    animate: {
+      opacity: 0.8,
+      scale: 1,
+      transition: {
+        duration: 1.2,
+        delay: 0.7,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'reverse',
+      },
+    },
+  };
+
+  const handleAnimation = async () => {
+    setIsLoading(true);
+    await controls.start({
+      rotate: 540,
+      scale: 1.3,
+      transition: { duration: 1.5, ease: 'easeInOut' },
+    });
+    await controls.start({
+      rotate: 0,
+      scale: 1,
+      transition: { duration: 1, ease: 'easeInOut' },
+    });
+    setIsLoading(false);
+    setShowFullText(true);
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+    setShowFullText(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black">
+      <motion.div
+        variants={logoVariants}
+        initial="initial"
+        animate="animate"
+        whileHover="hover"
+        whileTap="tap"
+        className="relative p-6 rounded-full shadow-2xl border border-gray-700/50 backdrop-blur-md transition-all duration-300 cursor-pointer flex flex-col items-center" // Agregado flex y items-center
+        onClick={handleAnimation}
+        ref={logoRef}
+      >
+        <div
+          className={cn(
+            'w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500',
+            isLoading ? 'bg-gray-500' : 'bg-gradient-to-br',
+          )}
+          style={{
+            backgroundImage: logoColor,
+          }}
+        >
+          {isLoading ? (
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          ) : (
+            <span className="text-4xl font-extrabold text-white drop-shadow-lg" style={{ fontFamily: fontFamily }}>
+              Z
+            </span>
+          )}
+        </div>
+
+        <motion.span
+          variants={textVariants}
+          initial="initial"
+          animate="animate"
+          className="mt-4 text-4xl font-bold text-white tracking-wider drop-shadow-lg transition-opacity text-center" // Agregado mt-4 y text-center
+        >
+          Zabala.Inc
+        </motion.span>
+
+        <motion.div variants={iconVariants} initial="initial" animate="animate" className="absolute top-0 left-0">
+          <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
+        </motion.div>
+        <motion.div
+          variants={iconVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute bottom-0 right-0"
+          style={{ rotate: '180deg', animationDelay: '0.8s' }}
+        >
+          <Zap className="w-5 h-5 text-blue-400 animate-bounce" />
+        </motion.div>
+        <motion.div
+          variants={iconVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute top-1/2 right-full mr-6"
+          style={{ animationDelay: '0.2s', rotate: '-90deg' }}
+        >
+          <Flame className="w-4 h-4 text-red-400" />
+        </motion.div>
+        <motion.div
+          variants={iconVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute bottom-full left-1/2 mb-4"
+          style={{ animationDelay: '1.2s', scale: 0.7 }}
+        >
+          <BrainCircuit className="w-6 h-6 text-purple-400" />
+        </motion.div>
+      </motion.div>
+
+      {showFullText && (
+        <motion.div
+          variants={fullTextVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="mt-8 text-center text-gray-300 text-lg max-w-xl overflow-hidden"
+          ref={textRef}
+        >
+          <p className="inline-block">
+            <strong>Zabala.Inc</strong> es una empresa dedicada a la innovación y el desarrollo de soluciones tecnológicas de vanguardia.
+            Nos apasiona crear productos que impulsan el futuro.
+            <Button
+              variant="link"
+              className="text-blue-400 p-0 ml-1 inline-flex items-center"
+              onClick={() => {
+                if (textRef.current) {
+                  textRef.current.classList.toggle('expanded');
+                }
+              }}
+            >
+              <ChevronRight className="w-4 h-4" />
+              <span className="sr-only">Leer más</span>
+            </Button>
+          </p>
+        </motion.div>
+      )}
+
+      <div className="mt-12">
+        <Button
+          onClick={toggleDarkMode}
+          className={cn(
+            'px-6 py-3 rounded-full transition-colors duration-300 text-lg font-semibold',
+            isDarkMode
+              ? 'bg-white/20 text-white hover:bg-white/30 border border-white/10 shadow-lg'
+              : 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 shadow-lg',
+          )}
+        >
+          Toggle {isDarkMode ? 'Light' : 'Dark'} Mode
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ZabalaIncLogo;
+
